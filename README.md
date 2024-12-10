@@ -58,6 +58,16 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## ENV
+
+```bash
+DB_PASSWORD=xd
+DB_NAME=xd
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+```
+
 ## Resources
 
 Check out a few resources that may come in handy when working with NestJS:
