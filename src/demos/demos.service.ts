@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
@@ -20,13 +21,10 @@ export class DemosService {
   async create(createDemoDto: CreateDemoDto) {
     try {
       const demo = this.demoRepository.create(createDemoDto);
-      throw new UnauthorizedException('Probando si se borra 112312');
       await this.demoRepository.save(demo);
       return demo;
     } catch (error) {
-      console.log(JSON.stringify(error));
-      this.customLoggerService.error(DemosService.name, JSON.stringify(error));
-      throw new InternalServerErrorException('Probando si se borra 2');
+      this.handleDBExceptions(error);
     }
   }
 
@@ -44,5 +42,15 @@ export class DemosService {
 
   remove(id: number) {
     return `This action removes a #${id} demo`;
+  }
+
+  private handleDBExceptions(error: any) {
+    this.customLoggerService.error(DemosService.name, JSON.stringify(error));
+    if (error.code === '23505') {
+      throw new BadRequestException(error.detail);
+    }
+    throw new InternalServerErrorException(
+      'Unexpected errorm check server logs',
+    );
   }
 }
