@@ -28,9 +28,9 @@ export class DemosController {
     return this.demosService.findAll(paginationDto);
   }
 
-  @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.demosService.findOne(id);
+  @Get(':term')
+  findOne(@Param('term') term: string) {
+    return this.demosService.findOne(term);
   }
 
   @Patch(':id')

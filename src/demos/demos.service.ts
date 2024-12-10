@@ -12,6 +12,7 @@ import { Demo } from './entities/demo.entity';
 import { Repository } from 'typeorm';
 import { CustomLoggerService } from 'src/custom-logger/custom-logger.service';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { validate as isUUID } from 'uuid';
 
 @Injectable()
 export class DemosService {
@@ -39,9 +40,20 @@ export class DemosService {
     return { demos, total };
   }
 
-  async findOne(id: string) {
-    const demo = await this.demoRepository.findOneBy({ id });
-    if (!demo) throw new NotFoundException(`Demo with id ${id} not found`);
+  async findOne(term: string) {
+    let demo: Demo;
+    if (isUUID(term)) {
+      demo = await this.demoRepository.findOneBy({ id: term });
+    } else {
+      const queryBuilder = this.demoRepository.createQueryBuilder();
+      demo = await queryBuilder
+        .where('UPPER(title) =:title or slug =:slug', {
+          title: term.toUpperCase(),
+          slug: term.toLowerCase(),
+        })
+        .getOne();
+    }
+    if (!demo) throw new NotFoundException(`Demo with term ${term} not found`);
     return demo;
   }
 
