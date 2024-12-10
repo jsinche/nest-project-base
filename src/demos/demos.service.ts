@@ -11,6 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Demo } from './entities/demo.entity';
 import { Repository } from 'typeorm';
 import { CustomLoggerService } from 'src/custom-logger/custom-logger.service';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
 @Injectable()
 export class DemosService {
@@ -29,8 +30,13 @@ export class DemosService {
     }
   }
 
-  async findAll() {
-    return await this.demoRepository.find();
+  async findAll(paginationDto: PaginationDto) {
+    const { limit = 10, offset = 0 } = paginationDto;
+    const [demos, total] = await this.demoRepository.findAndCount({
+      take: limit,
+      skip: offset,
+    });
+    return { demos, total };
   }
 
   async findOne(id: string) {

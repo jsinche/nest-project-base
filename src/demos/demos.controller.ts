@@ -7,10 +7,12 @@ import {
   Param,
   Delete,
   ParseUUIDPipe,
+  Query,
 } from '@nestjs/common';
 import { DemosService } from './demos.service';
 import { CreateDemoDto } from './dto/create-demo.dto';
 import { UpdateDemoDto } from './dto/update-demo.dto';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
 @Controller('demos')
 export class DemosController {
@@ -22,8 +24,8 @@ export class DemosController {
   }
 
   @Get()
-  findAll() {
-    return this.demosService.findAll();
+  findAll(@Query() paginationDto: PaginationDto) {
+    return this.demosService.findAll(paginationDto);
   }
 
   @Get(':id')
