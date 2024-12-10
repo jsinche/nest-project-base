@@ -34,8 +34,11 @@ export class DemosController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDemoDto: UpdateDemoDto) {
-    return this.demosService.update(+id, updateDemoDto);
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateDemoDto: UpdateDemoDto,
+  ) {
+    return this.demosService.update(id, updateDemoDto);
   }
 
   @Delete(':id')

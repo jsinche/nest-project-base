@@ -3,7 +3,6 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateDemoDto } from './dto/create-demo.dto';
 import { UpdateDemoDto } from './dto/update-demo.dto';
@@ -57,8 +56,17 @@ export class DemosService {
     return demo;
   }
 
-  update(id: number, updateDemoDto: UpdateDemoDto) {
-    return `This action updates a #${id} demo`;
+  async update(id: string, updateDemoDto: UpdateDemoDto) {
+    try {
+      const demo = await this.demoRepository.preload({
+        id,
+        ...updateDemoDto,
+      });
+      if (!demo) throw new NotFoundException(`Demo with id ${id} not found`);
+      return await this.demoRepository.save(demo);
+    } catch (error) {
+      this.handleDBExceptions(error);
+    }
   }
 
   async remove(id: string) {
