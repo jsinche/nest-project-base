@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { DemosService } from './demos.service';
 import { CreateDemoDto } from './dto/create-demo.dto';
@@ -26,8 +27,8 @@ export class DemosController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.demosService.findOne(+id);
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return this.demosService.findOne(id);
   }
 
   @Patch(':id')
@@ -36,7 +37,7 @@ export class DemosController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.demosService.remove(+id);
+  remove(@Param('id', ParseUUIDPipe) id: string) {
+    return this.demosService.remove(id);
   }
 }

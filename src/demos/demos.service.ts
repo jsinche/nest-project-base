@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateDemoDto } from './dto/create-demo.dto';
@@ -28,20 +29,22 @@ export class DemosService {
     }
   }
 
-  findAll() {
-    return `This action returns all demos`;
+  async findAll() {
+    return await this.demoRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} demo`;
+  async findOne(id: string) {
+    const demo = await this.demoRepository.findOneBy({ id });
+    if (!demo) throw new NotFoundException(`Demo with id ${id} not found`);
+    return demo;
   }
 
   update(id: number, updateDemoDto: UpdateDemoDto) {
     return `This action updates a #${id} demo`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} demo`;
+  async remove(id: string) {
+    return await this.demoRepository.delete({ id });
   }
 
   private handleDBExceptions(error: any) {
