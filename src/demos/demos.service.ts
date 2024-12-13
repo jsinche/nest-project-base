@@ -12,6 +12,7 @@ import { Repository } from 'typeorm';
 import { CustomLoggerService } from 'src/custom-logger/custom-logger.service';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { validate as isUUID } from 'uuid';
+import { TenantService } from 'src/tenants/tenant.service';
 
 @Injectable()
 export class DemosService {
@@ -19,7 +20,12 @@ export class DemosService {
     @InjectRepository(Demo)
     private readonly demoRepository: Repository<Demo>,
     private readonly customLoggerService: CustomLoggerService,
+    private readonly tenantService: TenantService,
   ) {}
+  async pruebitas(tenant: string) {
+    const queryRunner = await this.tenantService.getQueryRunner(tenant);
+    console.log(await queryRunner.query('SELECT * FROM demos'));
+  }
   async create(createDemoDto: CreateDemoDto) {
     try {
       const demo = this.demoRepository.create(createDemoDto);

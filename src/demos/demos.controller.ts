@@ -8,16 +8,26 @@ import {
   Delete,
   ParseUUIDPipe,
   Query,
+  Req,
 } from '@nestjs/common';
 import { DemosService } from './demos.service';
 import { CreateDemoDto } from './dto/create-demo.dto';
 import { UpdateDemoDto } from './dto/update-demo.dto';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { TenantService } from 'src/tenants/tenant.service';
 
 @Controller('demos')
 export class DemosController {
-  constructor(private readonly demosService: DemosService) {}
+  constructor(
+    private readonly demosService: DemosService,
+    private readonly tenantService: TenantService,
+  ) {}
 
+  @Post('pruebitas')
+  pruebitas(@Req() req: Request) {
+    const tenant = req['tenant'];
+    return this.demosService.pruebitas(tenant);
+  }
   @Post()
   create(@Body() createDemoDto: CreateDemoDto) {
     return this.demosService.create(createDemoDto);
