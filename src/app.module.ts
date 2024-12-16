@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DemosModule } from './demos/demos.module';
 import { CustomLoggerModule } from './custom-logger/custom-logger.module';
 import { CommonModule } from './common/common.module';
+import { AuthModule } from './auth/auth.module';
 import typeorm from './config/typeorm';
 
 @Module({
@@ -22,6 +23,7 @@ import typeorm from './config/typeorm';
     DemosModule,
     CustomLoggerModule,
     CommonModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
