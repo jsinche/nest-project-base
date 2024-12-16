@@ -13,8 +13,11 @@ import { DemosService } from './demos.service';
 import { CreateDemoDto } from './dto/create-demo.dto';
 import { UpdateDemoDto } from './dto/update-demo.dto';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { ValidRoles } from 'src/auth/interfaces/valid-roles';
 
 @Controller('demos')
+@Auth(ValidRoles.admin)
 export class DemosController {
   constructor(private readonly demosService: DemosService) {}
 
