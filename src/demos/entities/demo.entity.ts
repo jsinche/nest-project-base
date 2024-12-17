@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { DemoImage } from './demo-image.entity';
 
-@Entity()
+@Entity({ name: 'demos' })
 export class Demo {
   @PrimaryGeneratedColumn('uuid')
   id: string;
