@@ -102,7 +102,9 @@ export class DemosService {
   }
 
   async remove(id: string) {
-    return await this.demoRepository.delete({ id });
+    const demo = await this.findOne(id);
+    await this.demoRepository.remove(demo);
+    // return await this.demoRepository.delete({ id });
   }
 
   private handleDBExceptions(error: any) {
@@ -113,5 +115,14 @@ export class DemosService {
     throw new InternalServerErrorException(
       'Unexpected errorm check server logs',
     );
+  }
+
+  async deleteAllDemos() {
+    const query = this.demoRepository.createQueryBuilder('demo');
+    try {
+      return await query.delete().where({}).execute();
+    } catch (error) {
+      this.handleDBExceptions(error);
+    }
   }
 }
