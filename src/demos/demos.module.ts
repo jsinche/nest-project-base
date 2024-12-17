@@ -10,5 +10,6 @@ import { DemoImage } from './entities/demo-image.entity';
   controllers: [DemosController],
   providers: [DemosService],
   imports: [TypeOrmModule.forFeature([Demo, DemoImage]), AuthModule],
+  exports: [DemosService, TypeOrmModule],
 })
 export class DemosModule {}
