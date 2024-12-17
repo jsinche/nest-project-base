@@ -8,7 +8,7 @@ import { CreateDemoDto } from './dto/create-demo.dto';
 import { UpdateDemoDto } from './dto/update-demo.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Demo } from './entities/demo.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CustomLoggerService } from 'src/custom-logger/custom-logger.service';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { validate as isUUID } from 'uuid';
@@ -22,6 +22,7 @@ export class DemosService {
     @InjectRepository(DemoImage)
     private readonly demoImageRepository: Repository<DemoImage>,
     private readonly customLoggerService: CustomLoggerService,
+    private readonly dataSource: DataSource,
   ) {}
   async create(createDemoDto: CreateDemoDto) {
     try {
@@ -70,16 +71,33 @@ export class DemosService {
   }
 
   async update(id: string, updateDemoDto: UpdateDemoDto) {
+    const { images, ...toUpdate } = updateDemoDto;
+    const demo = await this.demoRepository.preload({
+      id,
+      ...toUpdate,
+    });
+    if (!demo) throw new NotFoundException(`Demo with id ${id} not found`);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
     try {
-      const demo = await this.demoRepository.preload({
-        id,
-        ...updateDemoDto,
-        images: [],
-      });
-      if (!demo) throw new NotFoundException(`Demo with id ${id} not found`);
-      return await this.demoRepository.save(demo);
+      if (images) {
+        await queryRunner.manager.delete(DemoImage, { demo: { id } });
+        demo.images = images.map((image) =>
+          this.demoImageRepository.create({ url: image }),
+        );
+      } else {
+        //
+      }
+      await queryRunner.manager.save(demo);
+      await queryRunner.commitTransaction();
+      return demo;
+      // return await this.demoRepository.save(demo);
     } catch (error) {
+      await queryRunner.rollbackTransaction();
       this.handleDBExceptions(error);
+    } finally {
+      await queryRunner.release();
     }
   }
 
