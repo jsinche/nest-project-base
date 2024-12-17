@@ -7,6 +7,7 @@ import { DemosModule } from './demos/demos.module';
 import { CustomLoggerModule } from './custom-logger/custom-logger.module';
 import { CommonModule } from './common/common.module';
 import { AuthModule } from './auth/auth.module';
+import { SeedModule } from './seed/seed.module';
 import typeorm from './config/typeorm';
 
 @Module({
@@ -24,6 +25,7 @@ import typeorm from './config/typeorm';
     CustomLoggerModule,
     CommonModule,
     AuthModule,
+    SeedModule,
   ],
   controllers: [AppController],
   providers: [AppService],
