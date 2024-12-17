@@ -54,7 +54,10 @@ export class Demo {
   })
   tags: string[];
 
-  @OneToMany(() => DemoImage, (demoImage) => demoImage.demo, { cascade: true })
+  @OneToMany(() => DemoImage, (demoImage) => demoImage.demo, {
+    cascade: true,
+    eager: true,
+  })
   images?: DemoImage[];
 
   @BeforeInsert()

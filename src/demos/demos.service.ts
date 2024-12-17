@@ -12,19 +12,28 @@ import { Repository } from 'typeorm';
 import { CustomLoggerService } from 'src/custom-logger/custom-logger.service';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { validate as isUUID } from 'uuid';
+import { DemoImage } from './entities/demo-image.entity';
 
 @Injectable()
 export class DemosService {
   constructor(
     @InjectRepository(Demo)
     private readonly demoRepository: Repository<Demo>,
+    @InjectRepository(DemoImage)
+    private readonly demoImageRepository: Repository<DemoImage>,
     private readonly customLoggerService: CustomLoggerService,
   ) {}
   async create(createDemoDto: CreateDemoDto) {
     try {
-      const demo = this.demoRepository.create(createDemoDto);
+      const { images = [], ...demoDetails } = createDemoDto;
+      const demo = this.demoRepository.create({
+        ...demoDetails,
+        images: images.map((image) =>
+          this.demoImageRepository.create({ url: image }),
+        ),
+      });
       await this.demoRepository.save(demo);
-      return demo;
+      return { ...demo, images };
     } catch (error) {
       this.handleDBExceptions(error);
     }
@@ -35,6 +44,9 @@ export class DemosService {
     const [demos, total] = await this.demoRepository.findAndCount({
       take: limit,
       skip: offset,
+      relations: {
+        images: true,
+      },
     });
     return { demos, total };
   }
@@ -44,12 +56,13 @@ export class DemosService {
     if (isUUID(term)) {
       demo = await this.demoRepository.findOneBy({ id: term });
     } else {
-      const queryBuilder = this.demoRepository.createQueryBuilder();
+      const queryBuilder = this.demoRepository.createQueryBuilder('demo');
       demo = await queryBuilder
         .where('UPPER(title) =:title or slug =:slug', {
           title: term.toUpperCase(),
           slug: term.toLowerCase(),
         })
+        .leftJoinAndSelect('demo.images', 'images')
         .getOne();
     }
     if (!demo) throw new NotFoundException(`Demo with term ${term} not found`);
@@ -61,6 +74,7 @@ export class DemosService {
       const demo = await this.demoRepository.preload({
         id,
         ...updateDemoDto,
+        images: [],
       });
       if (!demo) throw new NotFoundException(`Demo with id ${id} not found`);
       return await this.demoRepository.save(demo);
