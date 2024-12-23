@@ -8,6 +8,7 @@ import { CustomLoggerModule } from './custom-logger/custom-logger.module';
 import { CommonModule } from './common/common.module';
 import { AuthModule } from './auth/auth.module';
 import { SeedModule } from './seed/seed.module';
+import { FilesModule } from './files/files.module';
 import typeorm from './config/typeorm';
 
 @Module({
@@ -26,6 +27,7 @@ import typeorm from './config/typeorm';
     CommonModule,
     AuthModule,
     SeedModule,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
